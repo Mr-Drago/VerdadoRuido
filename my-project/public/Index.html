@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERDAD O RUIDO — Campaña contra la Desinformación Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --paper: #f5f0e8;
+      --red: #d62828;
+      --yellow: #f7b731;
+      --teal: #0d7377;
+      --gray: #6b6b6b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, .bebas { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.03em; }
+    .mono { font-family: 'Space Mono', monospace; }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.5;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .hero-left {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: var(--red);
+      opacity: 0.12;
+      bottom: -100px;
+      left: -80px;
+      filter: blur(60px);
+    }
+
+    .hero-right {
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .glitch-word {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 12vw, 10rem);
+      line-height: 0.9;
+      display: inline-block;
+      /* default color, individual instances can override */
+      color: var(--yellow);
+    }
+
+    /* Scrolling ticker */
+    .ticker-wrap {
+      overflow: hidden;
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      background: var(--yellow);
+      padding: 0.5rem 0;
+    }
+
+    .ticker {
+      display: flex;
+      gap: 4rem;
+      width: max-content;
+      animation: ticker 20s linear infinite;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* Cards section */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 3px solid var(--ink);
+    }
+
+    .card {
+      padding: 2.5rem;
+      border-right: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .card:last-child { border-right: none; }
+
+    .card:hover { background: var(--ink); color: var(--paper); }
+    .card:hover .card-icon { filter: invert(1); }
+    .card:hover .card-num { color: var(--yellow); }
+    .card:hover .card-border { background: var(--yellow); }
+
+    .card-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      line-height: 1;
+      color: var(--red);
+      transition: color 0.3s;
+    }
+
+    .card-border {
+      width: 2rem;
+      height: 3px;
+      background: var(--ink);
+      margin: 1rem 0;
+      transition: background 0.3s;
+    }
+
+    /* Alert box */
+    .alert-box {
+      background: var(--red);
+      color: var(--paper);
+      padding: 2rem 3rem;
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    /* Deepfake section */
+    .deepfake-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 3px solid var(--ink);
+    }
+
+    .df-left {
+      padding: 4rem 3rem;
+      border-right: 2px solid var(--ink);
+    }
+
+    .df-right {
+      background: var(--ink);
+      padding: 4rem 3rem;
+      color: var(--paper);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .face-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 280px;
+      background: #1a1a1a;
+      border: 2px solid var(--gray);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .face-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,255,200,0.04) 3px,
+        rgba(0,255,200,0.04) 4px
+      );
+      animation: scanline 4s linear infinite;
+    }
+
+    @keyframes scanline {
+      from { background-position: 0 0; }
+      to { background-position: 0 100px; }
+    }
+
+    .scan-bar {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: rgba(0,255,200,0.5);
+      box-shadow: 0 0 10px rgba(0,255,200,0.8);
+      animation: scan 3s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      0%, 100% { top: 0; }
+      50% { top: 100%; }
+    }
+
+    /* Steps section */
+    .steps {
+      padding: 5rem 3rem;
+      border-top: 3px solid var(--ink);
+      background: var(--paper);
+    }
+
+    .step-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 2rem;
+      align-items: start;
+      padding: 2rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .step-item:last-child { border-bottom: none; }
+
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--red);
+    }
+
+    /* Stats section */
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--teal);
+      color: var(--paper);
+      border-top: 3px solid var(--ink);
+    }
+
+    .stat-box {
+      padding: 3rem 2rem;
+      border-right: 1px solid rgba(255,255,255,0.2);
+      text-align: center;
+    }
+
+    .stat-box:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--yellow);
+    }
+
+    /* CTA */
+    .cta-section {
+      background: var(--yellow);
+      border-top: 3px solid var(--ink);
+      padding: 5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2rem;
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      padding: 1rem 2.5rem;
+      border: 2px solid var(--ink);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      padding: 1rem 2.5rem;
+      border: 2px solid var(--ink);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    /* Tag */
+    .tag {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid currentColor;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem;
+      border-top: 3px solid var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Nav */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      border-bottom: 2px solid var(--ink);
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-logo span { color: var(--red); }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .nav-links a { text-decoration: none; color: var(--ink); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--red); }
+
+    /* Quote */
+    .blockquote {
+      border-left: 4px solid var(--red);
+      padding-left: 1.5rem;
+      font-size: 1.3rem;
+      font-style: italic;
+      line-height: 1.6;
+      margin: 2rem 0;
+    }
+
+    /* Fade in animation */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.7s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.25s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.55s; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero, .deepfake-section { grid-template-columns: 1fr; }
+      .hero-left { min-height: 60vh; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .card { border-right: none; }
+      .stats-section { grid-template-columns: 1fr 1fr; }
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero-left, .hero-right, .df-left, .df-right { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">VERDAD<span>_</span>O<span>_</span>RUIDO</div>
+    <ul class="nav-links">
+      <li><a href="#amenazas">Amenazas</a></li>
+      <li><a href="#deepfakes">Deepfakes</a></li>
+      <li><a href="#guia">Guía</a></li>
+      <li><a href="#datos">Datos</a></li>
+      <li><a href="#actua">Actúa</a></li>
+    </ul>
+    <span class="tag">Campaña 2025</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div>
+        <span class="tag" style="color: var(--yellow); border-color: var(--yellow);">Campaña de Concientización Digital</span>
+        <div style="margin-top: 2.5rem;">
+          <div class="glitch-word" style="color: var(--yellow);">VERDAD</div>
+          <div class="glitch-word" style="color: var(--red);">O</div>
+          <div class="glitch-word" style="color: var(--yellow);">RUIDO</div>
+        </div>
+      </div>
+      <div>
+        <p class="mono" style="font-size: 0.8rem; color: rgba(245,240,232,0.5); margin-bottom: 1rem;">// La desinformación no es un error. Es una estrategia.</p>
+        <div style="width: 3rem; height: 3px; background: var(--red);"></div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="fade-in delay-1">
+        <span class="tag" style="color: var(--red); border-color: var(--red);">Urgente</span>
+        <h2 style="font-size: clamp(2rem, 4vw, 3.2rem); margin-top: 1.5rem; line-height: 1.1;">
+          Cada día se comparten millones de noticias falsas. ¿Sabes distinguirlas?
+        </h2>
+      </div>
+
+      <div class="fade-in delay-2" style="margin-top: 2rem;">
+        <p style="font-size: 1.05rem; line-height: 1.7; color: #333;">
+          La desinformación digital erosiona la democracia, polariza sociedades y pone vidas en riesgo. 
+          Los <strong>deepfakes</strong>, las <strong>noticias falsas</strong> y la <strong>manipulación algorítmica</strong> 
+          son armas del siglo XXI. Esta campaña te da las herramientas para defenderte.
+        </p>
+      </div>
+
+      <div class="fade-in delay-3" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="#guia" class="btn-primary">Ver la Guía</a>
+        <a href="#actua" class="btn-ghost">Únete</a>
+      </div>
+
+      <div class="fade-in delay-4" style="margin-top: 3rem; font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--gray); letter-spacing: 0.1em;">
+        ↓ SCROLL PARA APRENDER MÁS
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker mono" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">
+      <span>⚠ FAKE NEWS</span><span>◆ DEEPFAKES</span><span>⚠ MANIPULACIÓN DIGITAL</span>
+      <span>◆ DESINFORMACIÓN</span><span>⚠ CONTENIDO FABRICADO</span><span>◆ BOTS</span>
+      <span>⚠ PHISHING</span><span>◆ ASTROTURFING</span><span>⚠ CLICKBAIT</span>
+      <!-- repeat -->
+      <span>⚠ FAKE NEWS</span><span>◆ DEEPFAKES</span><span>⚠ MANIPULACIÓN DIGITAL</span>
+      <span>◆ DESINFORMACIÓN</span><span>⚠ CONTENIDO FABRICADO</span><span>◆ BOTS</span>
+      <span>⚠ PHISHING</span><span>◆ ASTROTURFING</span><span>⚠ CLICKBAIT</span>
+    </div>
+  </div>
+
+  <!-- AMENAZAS -->
+  <section id="amenazas">
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-num">01</div>
+        <div class="card-border"></div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Noticias Falsas</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: #444;">
+          Contenido fabricado o distorsionado diseñado para parecer legítimo. Se propaga 6 veces más rápido que la verdad en redes sociales. Los titulares sensacionalistas y las fuentes inexistentes son sus señales más comunes.
+        </p>
+        <div style="margin-top: 1.5rem;">
+          <span class="tag" style="font-size: 0.65rem;">Desinformación</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-num">02</div>
+        <div class="card-border"></div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Deepfakes</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: #444;">
+          Videos, audios e imágenes generadas por IA que reemplazan el rostro o la voz de una persona real con resultados casi perfectos. Se usan para desprestigiar figuras públicas, extorsión y propaganda política.
+        </p>
+        <div style="margin-top: 1.5rem;">
+          <span class="tag" style="font-size: 0.65rem;">IA Maliciosa</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-num">03</div>
+        <div class="card-border"></div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Manipulación Algorítmica</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: #444;">
+          Las plataformas priorizan contenido que genera reacciones emocionales, creando cámaras de eco. Los algoritmos amplifican la indignación, el miedo y la polarización porque generan más tiempo en pantalla.
+        </p>
+        <div style="margin-top: 1.5rem;">
+          <span class="tag" style="font-size: 0.65rem;">Sesgo Algorítmico</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-num">04</div>
+        <div class="card-border"></div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Astroturfing</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: #444;">
+          Campañas coordinadas de bots y cuentas falsas que simulan ser movimientos ciudadanos orgánicos. Crean la ilusión de consenso o apoyo masivo donde no lo hay.
+        </p>
+        <div style="margin-top: 1.5rem;">
+          <span class="tag" style="font-size: 0.65rem;">Manipulación Social</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-num">05</div>
+        <div class="card-border"></div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Clickbait y Titulares Trampa</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: #444;">
+          Titulares diseñados para generar clics con promesas que el contenido no cumple. Mezclan verdad y mentira para crear confusión y difundir ideas sin sustento real.
+        </p>
+        <div style="margin-top: 1.5rem;">
+          <span class="tag" style="font-size: 0.65rem;">Engaño</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-num">06</div>
+        <div class="card-border"></div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Contexto Falso</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; color: #444;">
+          Imágenes o videos reales usados fuera de su contexto original. Una foto de una protesta de otro país presentada como actual. El engaño no está en el contenido sino en cómo se encuadra.
+        </p>
+        <div style="margin-top: 1.5rem;">
+          <span class="tag" style="font-size: 0.65rem;">Malinformación</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERT -->
+  <div class="alert-box">
+    <div style="font-size: 2.5rem;">⚠</div>
+    <div>
+      <p class="mono" style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.3rem;">Dato crítico</p>
+      <p style="font-size: 1.1rem; font-weight: 500;">
+        El <strong>65% de las personas</strong> comparte contenido sin leerlo completo. La desinformación viaja al instante. La verificación tarda horas. Esa brecha es donde vive la manipulación.
+      </p>
+    </div>
+  </div>
+
+  <!-- DEEPFAKE SECTION -->
+  <section id="deepfakes" class="deepfake-section">
+    <div class="df-left">
+      <span class="tag" style="color: var(--red); border-color: var(--red);">Amenaza creciente</span>
+      <h2 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-top: 1.5rem; line-height: 1.05;">
+        DEEPFAKES:<br>Cuando ver ya<br>no es creer
+      </h2>
+
+      <blockquote class="blockquote">
+        "Si puedes crear la realidad, puedes crear el consenso. Y si puedes crear el consenso, tienes el poder."
+      </blockquote>
+
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #444; margin-top: 1.5rem;">
+        La tecnología de síntesis facial avanzó tan rápido que hoy cualquier persona con una computadora 
+        puede crear un video convincente de alguien diciendo algo que jamás dijo. Los deepfakes amenazan 
+        procesos electorales, reputaciones y la noción misma de evidencia.
+      </p>
+
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div style="padding: 1rem; border: 1px solid #ddd; flex: 1; min-width: 120px;">
+          <p class="mono" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray);">Crecimiento anual</p>
+          <p style="font-size: 2.5rem; font-family: 'Bebas Neue'; color: var(--red);">+900%</p>
+          <p style="font-size: 0.8rem; color: #555;">deepfakes detectados</p>
+        </div>
+        <div style="padding: 1rem; border: 1px solid #ddd; flex: 1; min-width: 120px;">
+          <p class="mono" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray);">Detección humana</p>
+          <p style="font-size: 2.5rem; font-family: 'Bebas Neue'; color: var(--red);">37%</p>
+          <p style="font-size: 0.8rem; color: #555;">tasa de acierto</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="df-right">
+      <span class="tag" style="color: var(--yellow); border-color: rgba(255,255,255,0.3); width: fit-content;">Cómo detectar un deepfake</span>
+
+      <div class="face-placeholder">
+        <div class="scan-bar"></div>
+        <div style="color: rgba(0,255,200,0.6); font-family: 'Space Mono'; font-size: 0.7rem; text-align: center; padding: 1rem; z-index: 2;">
+          <div style="font-size: 2.5rem; margin-bottom: 1rem;">👤</div>
+          <div>ANALIZANDO ROSTRO...</div>
+          <div style="margin-top: 0.5rem; color: rgba(0,255,200,0.4);">[ SIMULACIÓN ]</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <span style="color: var(--yellow); font-size: 1.2rem; flex-shrink: 0;">→</span>
+          <div>
+            <p style="font-weight: 600; margin-bottom: 0.2rem;">Parpadeo irregular</p>
+            <p style="font-size: 0.85rem; opacity: 0.7;">Los deepfakes frecuentemente fallan en replicar el parpadeo natural.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <span style="color: var(--yellow); font-size: 1.2rem; flex-shrink: 0;">→</span>
+          <div>
+            <p style="font-weight: 600; margin-bottom: 0.2rem;">Bordes difusos en cabello y piel</p>
+            <p style="font-size: 0.85rem; opacity: 0.7;">La transición entre el rostro sintético y el entorno suele ser imprecisa.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <span style="color: var(--yellow); font-size: 1.2rem; flex-shrink: 0;">→</span>
+          <div>
+            <p style="font-weight: 600; margin-bottom: 0.2rem;">Iluminación inconsistente</p>
+            <p style="font-size: 0.85rem; opacity: 0.7;">La luz en el rostro no coincide con la del entorno del video.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <span style="color: var(--yellow); font-size: 1.2rem; flex-shrink: 0;">→</span>
+          <div>
+            <p style="font-weight: 600; margin-bottom: 0.2rem;">Audio desincronizado</p>
+            <p style="font-size: 0.85rem; opacity: 0.7;">El movimiento de labios no coincide exactamente con las palabras.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESTADÍSTICAS -->
+  <div id="datos" class="stats-section">
+    <div class="stat-box">
+      <div class="stat-num">6×</div>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">más rápido se propagan las noticias falsas que las verdaderas</p>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">78%</div>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">de adultos han creído una noticia falsa en el último año</p>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">500M</div>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">piezas de desinformación circulan cada día en redes sociales</p>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">12%</div>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">del contenido viral ha pasado por algún proceso de verificación</p>
+    </div>
+  </div>
+
+  <!-- GUÍA PRÁCTICA -->
+  <section id="guia" class="steps">
+    <div style="max-width: 900px; margin: 0 auto;">
+      <span class="tag" style="color: var(--teal); border-color: var(--teal);">Guía práctica</span>
+      <h2 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-top: 1rem; line-height: 1.05;">
+        CÓMO DETECTAR<br>DESINFORMACIÓN
+      </h2>
+      <p style="margin-top: 1rem; color: var(--gray); font-size: 1rem; max-width: 600px;">
+        No se trata de ser desconfiado. Se trata de ser crítico. Sigue estos pasos antes de compartir cualquier contenido.
+      </p>
+
+      <div style="margin-top: 3rem;">
+        <div class="step-item">
+          <div class="step-num">01</div>
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Verifica la fuente</h3>
+            <p style="color: #555; line-height: 1.7;">
+              Busca quién publica el contenido. ¿Es un medio reconocido? ¿Tiene historial verificable? 
+              Las cuentas recientes, sin fotos de perfil o con nombres genéricos son señal de alerta. 
+              Verifica en medios de verificación como <strong>Snopes, FactCheck.org o Verificado</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">02</div>
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Busca cobertura cruzada</h3>
+            <p style="color: #555; line-height: 1.7;">
+              Si una noticia importante es real, múltiples medios la cubren de forma independiente. 
+              Si solo aparece en un sitio desconocido o en cadenas de WhatsApp, investiga más antes de compartir.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">03</div>
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Revierte la búsqueda de imágenes</h3>
+            <p style="color: #555; line-height: 1.7;">
+              Usa <strong>Google Images o TinEye</strong> para buscar el origen de una foto. Muchas imágenes "actuales" 
+              son de años atrás o de lugares completamente diferentes a los que se afirma.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">04</div>
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Controla tus emociones</h3>
+            <p style="color: #555; line-height: 1.7;">
+              El contenido diseñado para manipular apela a la rabia, el miedo o la euforia. 
+              Si una noticia te genera una reacción muy intensa, es señal de que debes verificarla 
+              con más cuidado antes de reaccionar o compartir.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">05</div>
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Lee más allá del titular</h3>
+            <p style="color: #555; line-height: 1.7;">
+              El 65% del contenido se comparte sin leer. Los titulares están diseñados para provocar reacción, 
+              no para informar. Lee el artículo completo, verifica las citas y revisa si hay fuentes primarias.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">06</div>
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Pausa antes de compartir</h3>
+            <p style="color: #555; line-height: 1.7;">
+              El acto más poderoso contra la desinformación es <strong>no compartir lo que no puedes verificar</strong>. 
+              Cada vez que compartes sin verificar, te conviertes involuntariamente en parte de la red de desinformación.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉTICA DIGITAL -->
+  <section style="display: grid; grid-template-columns: 1fr 1fr; border-top: 3px solid var(--ink);">
+    <div style="padding: 4rem 3rem; background: var(--paper); border-right: 2px solid var(--ink);">
+      <span class="tag" style="color: var(--teal); border-color: var(--teal);">Uso ético</span>
+      <h2 style="font-size: clamp(2rem, 4vw, 3.2rem); margin-top: 1.5rem; line-height: 1.05;">
+        TU RESPONSABILIDAD COMO CIUDADANO DIGITAL
+      </h2>
+      <p style="margin-top: 1.5rem; font-size: 0.95rem; line-height: 1.7; color: #444;">
+        La libertad de expresión no incluye el derecho a mentir impunemente. En la era digital, 
+        cada persona es también un medio de comunicación. Con ese poder viene responsabilidad.
+      </p>
+      <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 8px; height: 8px; background: var(--teal); border-radius: 50%;"></div>
+          <p>Verificar antes de compartir</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 8px; height: 8px; background: var(--teal); border-radius: 50%;"></div>
+          <p>Reportar contenido engañoso en plataformas</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 8px; height: 8px; background: var(--teal); border-radius: 50%;"></div>
+          <p>Corregir públicamente si compartes algo falso</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 8px; height: 8px; background: var(--teal); border-radius: 50%;"></div>
+          <p>Educar a tu entorno sobre pensamiento crítico</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 8px; height: 8px; background: var(--teal); border-radius: 50%;"></div>
+          <p>Diversificar tus fuentes de información</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 4rem 3rem; background: var(--ink); color: var(--paper);">
+      <span class="tag" style="color: var(--yellow); border-color: rgba(255,255,255,0.3);">Recuerda siempre</span>
+      <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 2rem;">
+        <div style="border-left: 3px solid var(--yellow); padding-left: 1.5rem;">
+          <p style="font-size: 1rem; line-height: 1.6; opacity: 0.9;">
+            <strong style="color: var(--yellow);">La desinformación no discrimina.</strong> Afecta tanto a personas con poca educación como a profesionales y académicos.
+          </p>
+        </div>
+        <div style="border-left: 3px solid var(--red); padding-left: 1.5rem;">
+          <p style="font-size: 1rem; line-height: 1.6; opacity: 0.9;">
+            <strong style="color: var(--red);">Los algoritmos no están de tu lado.</strong> Están diseñados para maximizar engagement, no para informarte correctamente.
+          </p>
+        </div>
+        <div style="border-left: 3px solid var(--teal); padding-left: 1.5rem;">
+          <p style="font-size: 1rem; line-height: 1.6; opacity: 0.9;">
+            <strong style="color: #4dd9dc;">La IA puede crear cualquier cosa.</strong> Audio, video, imagen. El pensamiento crítico es tu única defensa real.
+          </p>
+        </div>
+        <div style="border-left: 3px solid rgba(255,255,255,0.3); padding-left: 1.5rem;">
+          <p style="font-size: 1rem; line-height: 1.6; opacity: 0.9;">
+            <strong>La verdad existe.</strong> Requiere esfuerzo encontrarla. Pero ese esfuerzo es lo que nos hace ciudadanos y no meras piezas de una campaña de manipulación.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="actua" class="cta-section">
+    <span class="tag" style="color: var(--ink); border-color: var(--ink);">Toma acción</span>
+    <h2 style="font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.05; max-width: 700px;">
+      EL ANTÍDOTO CONTRA LA DESINFORMACIÓN ES LA COMUNIDAD
+    </h2>
+    <p style="max-width: 550px; font-size: 1rem; line-height: 1.7; color: #333;">
+      Comparte esta campaña, habla con tu entorno sobre pensamiento crítico y ayuda a construir 
+      una cultura digital más responsable. La desinformación solo gana cuando nadie la cuestiona.
+    </p>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;">
+      <a href="../src/CÓMO DETECTAR DESINFORMACIÓN.pdf" download="CÓMO DETECTAR DESINFORMACIÓN.pdf" class="btn-primary">↓ Descargar Guía PDF</a>
+      <button class="btn-ghost" onclick="copiarLink()">Compartir Campaña</button>
+    </div>
+    <p class="mono" style="font-size: 0.7rem; color: var(--gray); margin-top: 2rem; letter-spacing: 0.1em;">
+      #VerdadORuido &nbsp;·&nbsp; #NoCompartasSinVerificar &nbsp;·&nbsp; #ÉticaDigital
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="nav-logo" style="color: var(--paper);">VERDAD<span style="color: var(--red);">_</span>O<span style="color: var(--red);">_</span>RUIDO</div>
+      <p class="mono" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 0.5rem;">Campaña de concientización digital · 2025</p>
+    </div>
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+      <a href="#amenazas" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem;">Amenazas</a>
+      <a href="#deepfakes" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem;">Deepfakes</a>
+      <a href="#guia" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem;">Guía</a>
+      <a href="#actua" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem;">Actúa</a>
+    </div>
+    <p class="mono" style="font-size: 0.65rem; color: rgba(255,255,255,0.3);">La información es poder. Úsala bien.</p>
+  </footer>
+
+  <!-- TOAST NOTIFICACIÓN -->
+  <div id="toast" style="
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(6rem);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    padding: 1rem 2rem;
+    border: 2px solid var(--yellow);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 9999;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+    opacity: 0;
+    white-space: nowrap;
+    box-shadow: 4px 4px 0px var(--yellow);
+  ">
+    <span style="color: var(--yellow); font-size: 1.1rem;">✓</span>
+    ¡LINK COPIADO AL PORTAPAPELES!
+  </div>
+
+  <script>
+    function copiarLink() {
+      const url = 'https://open.spotify.com/intl-es/track/1TPWiLyJaj9Ko5OoVAA09j';
+
+      navigator.clipboard.writeText(url).then(() => {
+        mostrarToast();
+      }).catch(() => {
+        // fallback para navegadores sin clipboard API
+        const temp = document.createElement('textarea');
+        temp.value = url;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        mostrarToast();
+      });
+    }
+
+    function mostrarToast() {
+      const toast = document.getElementById('toast');
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.opacity = '1';
+
+      setTimeout(() => {
+        toast.style.transform = 'translateX(-50%) translateY(6rem)';
+        toast.style.opacity = '0';
+      }, 3000);
+    }
+
+    // anchors with hash href scroll with slow‑fast‑slow motion (nav links and buttons)
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const id = link.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if (target) animateScroll(target);
+      });
+    });
+
+    function animateScroll(el) {
+      const start = window.scrollY;
+      const end = el.getBoundingClientRect().top + start;
+      const distance = end - start;
+      const duration = 1000; // milliseconds
+      let startTime = null;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let time = timestamp - startTime;
+        let progress = Math.min(time / duration, 1);
+        // ease-in-out quad: slow start, faster middle, slow end
+        let eased = progress < 0.5
+          ? 2 * progress * progress
+          : -1 + (4 - 2 * progress) * progress;
+        window.scrollTo(0, start + distance * eased);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+  </script>
+</body>
+</html>
